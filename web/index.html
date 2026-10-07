@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Code[{π*}]</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b0d12;color:#eee;font:15px Arial}
+main{max-width:700px;margin:auto;padding:35px 18px}
+header{text-align:center;margin-bottom:30px}
+h1{font-size:34px;margin:0}
+header p{color:#888}
+.card{background:#13161d;border:1px solid #252a35;border-radius:14px;padding:18px;margin:15px 0}
+h2{margin-top:0}
+textarea,input,button{width:100%;padding:12px;margin:6px 0;border-radius:9px;border:1px solid #303642;background:#0d1016;color:#fff}
+textarea{min-height:110px;resize:vertical}
+button{cursor:pointer;font-weight:bold;background:#eee;color:#111}
+.status{color:#888;font-size:13px}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>Code[{π*}]</h1>
+<p>Secure encryption toolkit</p>
+</header>
+
+<section class="card">
+<h2>Encrypt</h2>
+<textarea id="m" placeholder="Enter your message"></textarea>
+<input id="ep" type="password" placeholder="Password">
+<button onclick="encrypt()">Encrypt</button>
+<textarea id="out" readonly placeholder="[{...}]"></textarea>
+</section>
+
+<section class="card">
+<h2>Decrypt</h2>
+<textarea id="in" placeholder="Paste [{...}]"></textarea>
+<input id="dp" type="password" placeholder="Password">
+<button onclick="decrypt()">Decrypt</button>
+<textarea id="result" readonly placeholder="Decrypted message"></textarea>
+</section>
+
+<p class="status">AES-256-GCM · Local browser encryption</p>
+<script>
+const F="π+[3.14159265358979323846264338327950288419716939937510]{}/";
+const E=new TextEncoder(),D=new TextDecoder();
+
+async function key(p){
+ const h=await crypto.subtle.digest("SHA-256",E.encode(F+p));
+ return crypto.subtle.importKey("raw",h,{name:"AES-GCM"},false,["encrypt","decrypt"]);
+}
+
+function b64(a){
+ return btoa(String.fromCharCode(...a))
+ .replace(/\+/g,"-").replace(/\//g,"_").replace(/=/g,"");
+}
+
+function unb64(s){
+ s=s.replace(/-/g,"+").replace(/_/g,"/");
+ while(s.length%4)s+="=";
+ return Uint8Array.from(atob(s),x=>x.charCodeAt(0));
+}
+
+async function encrypt(){
+ const n=crypto.getRandomValues(new Uint8Array(12));
+ const c=new Uint8Array(await crypto.subtle.encrypt(
+  {name:"AES-GCM",iv:n,additionalData:E.encode(F)},
+  await key(ep.value),E.encode(m.value)
+ ));
+ const a=new Uint8Array(12+c.length);
+ a.set(n);a.set(c,12);
+ out.value="[{"+b64(a)+"}]";
+}
+
+async function decrypt(){
+ try{
+  const a=unb64(in.value.slice(2,-2));
+  result.value=D.decode(await crypto.subtle.decrypt(
+   {name:"AES-GCM",iv:a.slice(0,12),additionalData:E.encode(F)},
+   await key(dp.value),a.slice(12)
+  ));
+ }catch{
+  result.value="Authentication failed.";
+ }
+}
+</script>
+</main>
+</body>
+</html>

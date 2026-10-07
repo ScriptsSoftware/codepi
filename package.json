@@ -1,0 +1,23 @@
+{
+  "name": "codepi",
+  "version": "1.0.0",
+  "description": "Secure encryption toolkit with the .Codepack[{}] format",
+  "main": "lib/codepack.js",
+  "bin": {
+    "codepi": "bin/codepi.js"
+  },
+  "scripts": {
+    "test": "node --check bin/codepi.js && node --check lib/encrypt.js && node --check lib/decrypt.js && node --check lib/codepack.js"
+  },
+  "keywords": [
+    "encryption",
+    "aes-256-gcm",
+    "codepack",
+    "security",
+    "termux"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}
