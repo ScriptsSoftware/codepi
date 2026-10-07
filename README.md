@@ -32,3 +32,7 @@ codepi validate "[{...}]"
 ## License
 
 MIT
+
+## GitHub
+
+https://github.com/ScriptsSoftware/codepi
